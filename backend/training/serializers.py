@@ -1,41 +1,110 @@
 from rest_framework import serializers
-from .models import Course
-import json
+from .models import (
+    Course,
+    CourseImage,
+    CourseMode,
+    WhyChoose,
+    CourseHighlight,
+    IdealFor,
+    CareerOpportunity,
+    Curriculum,
+    CurriculumTopic,
+    CourseFAQ,
+)
 
-class CourseSerializer(serializers.ModelSerializer):
-    # For TextField fields that store JSON strings, define custom methods to handle serialization/deserialization
-    tools = serializers.SerializerMethodField()
-    course_modes = serializers.SerializerMethodField()
-    career_opportunities = serializers.SerializerMethodField()
-    course_highlights = serializers.SerializerMethodField()
-    ideal_for = serializers.SerializerMethodField()
-    images = serializers.SerializerMethodField()
+# -------------------
+# Child Serializers
+# -------------------
+
+class CourseFAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseFAQ
+        fields = ["id", "question", "answer", "order"]
+
+class CourseImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseImage
+        fields = ["id", "image", "alt_text", "order"]
+
+class CourseModeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseMode
+        fields = ["id", "mode"]
+
+class WhyChooseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WhyChoose
+        fields = ["id", "title", "description"]
+
+class CourseHighlightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseHighlight
+        fields = ["id", "text"]
+
+class IdealForSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IdealFor
+        fields = ["id", "text"]
+
+class CareerOpportunitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CareerOpportunity
+        fields = ["id", "role"]
+
+class CurriculumTopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CurriculumTopic
+        fields = ["id", "title"]
+
+class CurriculumSerializer(serializers.ModelSerializer):
+    topics = CurriculumTopicSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Curriculum
+        fields = ["id", "title", "order", "topics"]
+
+# -------------------
+# Main Course Serializer
+# -------------------
+
+class CourseDetailSerializer(serializers.ModelSerializer):
+    images = CourseImageSerializer(many=True, read_only=True)
+    modes = CourseModeSerializer(many=True, read_only=True)
+    why_choose = WhyChooseSerializer(many=True, read_only=True)
+    highlights = CourseHighlightSerializer(many=True, read_only=True)
+    ideal_for = IdealForSerializer(many=True, read_only=True)
+    careers = CareerOpportunitySerializer(many=True, read_only=True)
+    curriculum = CurriculumSerializer(many=True, read_only=True)
+    faqs = CourseFAQSerializer(many=True, read_only=True)  # ✅ FIXED
 
     class Meta:
         model = Course
-        fields = '__all__'
+        fields = [
+            "id",
+            "title",
+            "slug",
+            "short_description",
+            "long_description",
+            "duration",
+            "price",
+            "discount",
+            "breakdown",
+            "images",
+            "modes",
+            "why_choose",
+            "highlights",
+            "ideal_for",
+            "careers",
+            "curriculum",
+            "faqs",  # ✅ FIXED
+        ]
 
-    def get_tools(self, obj):
-        return json.loads(obj.tools)
+# -------------------
+# Course List Serializer
+# -------------------
 
-    def get_course_modes(self, obj):
-        return json.loads(obj.course_modes)
-
-    def get_career_opportunities(self, obj):
-        return json.loads(obj.career_opportunities)
-
-    def get_course_highlights(self, obj):
-        return json.loads(obj.course_highlights)
-
-    def get_ideal_for(self, obj):
-        return json.loads(obj.ideal_for)
-
-    def get_images(self, obj):
-        return json.loads(obj.images)
-
-    def to_internal_value(self, data):
-        # Handle deserialization for TextField fields that store JSON strings
-        for field_name in ['tools', 'course_modes', 'career_opportunities', 'course_highlights', 'ideal_for', 'images']:
-            if field_name in data and isinstance(data[field_name], list):
-                data[field_name] = json.dumps(data[field_name])
-        return super().to_internal_value(data)
+class CourseListSerializer(serializers.ModelSerializer):
+    images = CourseImageSerializer(many=True, read_only=True)
+    class Meta:
+        model = Course
+        fields = ["id", "title", "slug", "short_description", "duration","price","discount","images",]
