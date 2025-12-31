@@ -1,15 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   MapPin, Phone, Mail, Send, 
   ChevronDown, Map as MapIcon,
-  Facebook, Twitter, Linkedin, ArrowRight
+  Facebook, Twitter, Linkedin, ArrowRight, Loader2, CheckCircle2
 } from 'lucide-react';
 
 const EnquiryPage = () => {
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  };
+
+  const [formData, setFormData] = useState({
+      name: "", phone: "", email: "", course: "Select a course", message: ""
+  });
+  const [status, setStatus] = useState("idle");
+
+  const handleChange = (e) => {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      setStatus("loading");
+      // Map 'course' to 'subject' for the API compatibility
+      const apiData = {
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          subject: `Enquiry for ${formData.course}`,
+          message: formData.message
+      };
+
+      try {
+          const response = await fetch("http://localhost:8000/api/contact/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(apiData),
+          });
+          if (response.ok) {
+              setStatus("success");
+              setFormData({ name: "", phone: "", email: "", course: "Select a course", message: "" });
+              setTimeout(() => setStatus("idle"), 3000);
+          } else {
+              setStatus("error");
+          }
+      } catch (error) {
+          setStatus("error");
+      }
   };
 
   return (
@@ -50,7 +89,7 @@ const EnquiryPage = () => {
                   </div>
                   <div>
                     <p className="font-black text-sm mb-1 uppercase tracking-widest text-slate-400">Headquarters</p>
-                    <p className="text-slate-700 font-bold leading-relaxed">123 Tech Park, Innovation Street, Silicon Valley, CA</p>
+                    <p className="text-slate-700 font-bold leading-relaxed">36, 2nd Street, Kumarappa Nagar, Katpadi, Vellore - 632007</p>
                   </div>
                 </div>
 
@@ -61,7 +100,7 @@ const EnquiryPage = () => {
                   </div>
                   <div>
                     <p className="font-black text-sm mb-1 uppercase tracking-widest text-slate-400">Phone</p>
-                    <p className="text-slate-700 font-bold">+1 (555) 000-0000</p>
+                    <p className="text-slate-700 font-bold">+91 94446 59702</p>
                   </div>
                 </div>
 
@@ -72,7 +111,7 @@ const EnquiryPage = () => {
                   </div>
                   <div>
                     <p className="font-black text-sm mb-1 uppercase tracking-widest text-slate-400">Email</p>
-                    <p className="text-slate-700 font-bold">admissions@csc-institute.edu</p>
+                    <p className="text-slate-700 font-bold">kctce2007@gmail.com</p>
                   </div>
                 </div>
               </div>
@@ -90,7 +129,10 @@ const EnquiryPage = () => {
               />
               <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors duration-500"></div>
               
-              <button className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 border border-slate-100">
+              <button 
+                onClick={() => window.open("https://maps.google.com/?q=36,+2nd+Street,+Kumarappa+Nagar,+Katpadi,+Vellore", "_blank")}
+                className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl hover:bg-blue-600 hover:text-white transition-all active:scale-95 border border-slate-100"
+              >
                 <MapIcon size={14} /> Open in Google Maps
               </button>
             </motion.div>
@@ -106,16 +148,16 @@ const EnquiryPage = () => {
               <p className="text-gray-400 text-base font-medium">Fill out the form below and our team will get back to you within 24 hours.</p>
             </div>
 
-            <form className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Row 1: Name & Email */}
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Full Name</label>
-                  <input type="text" placeholder="Jane Doe" className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none" />
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Jane Doe" className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Address</label>
-                  <input type="email" placeholder="jane@example.com" className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none" />
+                  <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="jane@example.com" className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none" />
                 </div>
               </div>
 
@@ -123,17 +165,17 @@ const EnquiryPage = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Phone Number</label>
-                  <input type="text" placeholder="+1 (555) 000-0000" className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none" />
+                  <input type="text" name="phone" value={formData.phone} onChange={handleChange} required placeholder="+91 94446 59702" className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none" />
                 </div>
                 <div className="space-y-2 relative">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Interested Course</label>
                   <div className="relative">
-                    <select className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none appearance-none cursor-pointer">
+                    <select name="course" value={formData.course} onChange={handleChange} className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none appearance-none cursor-pointer">
                       <option>Select a course</option>
                       <option>Full Stack Web Development</option>
                       <option>Data Science & AI</option>
-                      <option>Cyber Security Specialist</option>
-                      <option>Cloud Computing (AWS)</option>
+                      <option>Tally Prime</option>
+                      <option>DCA / HDCA</option>
                     </select>
                     <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
                   </div>
@@ -143,53 +185,26 @@ const EnquiryPage = () => {
               {/* Row 3: Message */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Message</label>
-                <textarea rows="5" placeholder="Tell us about your learning goals..." className="w-full bg-slate-50 border-2 border-transparent rounded-3xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none resize-none"></textarea>
+                <textarea name="message" value={formData.message} onChange={handleChange} required rows="5" placeholder="Tell us about your learning goals..." className="w-full bg-slate-50 border-2 border-transparent rounded-3xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none resize-none"></textarea>
               </div>
 
               {/* Submit Button */}
-              <button className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-300 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em] group relative overflow-hidden">
-                <span className="relative z-10">Send Message</span>
-                <Send size={18} className="relative z-10 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-300" />
+              <button 
+                type="submit" 
+                disabled={status === "loading"}
+                className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-300 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em] group relative overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                  {status === "loading" ? <Loader2 size={18} className="animate-spin" /> : 
+                   status === "success" ? <>Message Sent! <CheckCircle2 size={18}/></> : 
+                   status === "error" ? "Error! Try Again" : 
+                   <>Send Message <Send size={18} className="relative z-10 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-300" /></>}
               </button>
             </form>
           </motion.div>
         </div>
       </main>
 
-      {/* --- 4. FOOTER --- */}
-      <footer className="bg-white pt-24 pb-12 border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
-          <div className="col-span-1">
-            <div className="flex items-center gap-2 font-black text-2xl text-blue-600 mb-8 tracking-tighter">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-sm">C</div> CSC Institute
-            </div>
-            <p className="text-gray-400 font-medium leading-relaxed">Empowering the next generation of tech leaders through industry-focused education.</p>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.3em] mb-8 text-slate-400">Resources</h5>
-            <ul className="space-y-4 text-slate-500 font-bold text-sm">
-              <li><a href="#" className="hover:text-blue-600">Free Workshop</a></li>
-              <li><a href="#" className="hover:text-blue-600">Career Guide</a></li>
-              <li><a href="#" className="hover:text-blue-600">Scholarships</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.3em] mb-8 text-slate-400">Newsletter</h5>
-            <div className="flex gap-2">
-              <input type="text" placeholder="Email" className="bg-slate-50 border-none rounded-xl px-4 py-3 text-xs w-full focus:ring-2 focus:ring-blue-100" />
-              <button className="bg-blue-600 p-3 rounded-xl text-white hover:bg-blue-700 transition-all"><ArrowRight size={16} /></button>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-100 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
-          <p>© 2024 CSC Institute. All Rights Reserved.</p>
-          <div className="flex gap-8">
-            <Facebook size={16} className="hover:text-blue-600 transition-colors cursor-pointer" />
-            <Twitter size={16} className="hover:text-blue-600 transition-colors cursor-pointer" />
-            <Linkedin size={16} className="hover:text-blue-600 transition-colors cursor-pointer" />
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 };

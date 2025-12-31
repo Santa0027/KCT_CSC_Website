@@ -13,14 +13,15 @@ class ContactMailView(APIView):
 
             name = serializer.validated_data.get('name')
             email = serializer.validated_data.get('email')
+            phone = serializer.validated_data.get('phone', 'N/A')
             subject = serializer.validated_data.get('subject')
             message = serializer.validated_data.get('message')
 
             # Send email
             try:
                 send_mail(
-                    f"Contact Form: {subject}",
-                    f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}",
+                    f"Contact Form: {subject} - from {name}",
+                    f"Name: {name}\nPhone: {phone}\nEmail: {email}\n\nMessage:\n{message}",
                     settings.DEFAULT_FROM_EMAIL,
                     [settings.CONTACT_RECIPIENT_EMAIL], # Send to the configured recipient email
                     fail_silently=False,

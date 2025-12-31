@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'training',
     'corsheaders',
     'blogs',
-    
+    'testimonials',
 ]
 
 
@@ -149,3 +149,13 @@ MEDIA_URL = '/media/'
 
 # The absolute filesystem path to the directory that will hold user-uploaded files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console for debugging
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'kctce2007@gmail.com'  # User's email
+EMAIL_HOST_PASSWORD = 'your-app-password-here' # Placeholder, user needs to update this
+DEFAULT_FROM_EMAIL = 'kctce2007@gmail.com'
+CONTACT_RECIPIENT_EMAIL = 'kctce2007@gmail.com'

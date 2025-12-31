@@ -1,117 +1,326 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Play, Users, Award, BookOpen, Clock, 
-  ChevronRight, Star, ArrowRight, MapPin, 
-  Phone, Mail, Facebook, Twitter, Linkedin,
-  CheckCircle2, Send
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import {
+  Play, Users, Award, BookOpen, Clock, ChevronRight, Star, ArrowRight,
+  MapPin, Phone, Mail, CheckCircle2, Send, Loader2
+} from "lucide-react";
+
+// Animation Variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const ContactForm = () => {
+    const [formData, setFormData] = useState({
+        name: "", phone: "", email: "", subject: "", message: ""
+    });
+    const [status, setStatus] = useState("idle"); // idle, loading, success, error
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setStatus("loading");
+        try {
+            const response = await fetch("http://localhost:8000/api/contact/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+            if (response.ok) {
+                setStatus("success");
+                setFormData({ name: "", phone: "", email: "", subject: "", message: "" });
+                setTimeout(() => setStatus("idle"), 3000);
+            } else {
+                setStatus("error");
+            }
+        } catch (error) {
+            setStatus("error");
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+            <div className="grid grid-cols-2 gap-6">
+                <input 
+                    type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required
+                    className="bg-white/10 border border-white/20 placeholder:text-blue-200 text-white rounded-2xl p-5 text-sm font-bold w-full focus:outline-none focus:bg-white/20 transition-all" 
+                />
+                <input 
+                    type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} required
+                    className="bg-white/10 border border-white/20 placeholder:text-blue-200 text-white rounded-2xl p-5 text-sm font-bold w-full focus:outline-none focus:bg-white/20 transition-all" 
+                />
+            </div>
+            <input 
+                type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} required
+                className="bg-white/10 border border-white/20 placeholder:text-blue-200 text-white rounded-2xl p-5 text-sm font-bold w-full focus:outline-none focus:bg-white/20 transition-all" 
+            />
+             <input 
+                type="text" name="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} required
+                className="bg-white/10 border border-white/20 placeholder:text-blue-200 text-white rounded-2xl p-5 text-sm font-bold w-full focus:outline-none focus:bg-white/20 transition-all" 
+            />
+            <textarea 
+                name="message" placeholder="Message" rows="4" value={formData.message} onChange={handleChange} required
+                className="bg-white/10 border border-white/20 placeholder:text-blue-200 text-white rounded-2xl p-5 text-sm font-bold w-full focus:outline-none focus:bg-white/20 transition-all"
+            ></textarea>
+            
+            <button 
+                type="submit" 
+                disabled={status === "loading"}
+                className="w-full bg-white text-blue-600 font-black py-5 rounded-[1.25rem] shadow-xl uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-blue-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+                {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : 
+                 status === "success" ? <>Message Sent! <CheckCircle2 size={16}/></> : 
+                 status === "error" ? "Error! Try Again" : 
+                 <>Send Message <Send size={16} /></>}
+            </button>
+        </form>
+    );
+};
 
 const FullHomePage = () => {
-  // Animation Variants
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } }
+  const [courses, setCourses] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const BASE_URL = "http://localhost:8000";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [courseRes, reviewRes] = await Promise.all([
+          fetch(`${BASE_URL}/api/courses/`),
+          fetch(`${BASE_URL}/api/reviews/`)
+        ]);
+        
+        const courseData = await courseRes.json();
+        const reviewData = await reviewRes.json();
+        
+        setCourses(Array.isArray(courseData) ? courseData : []);
+        setReviews(Array.isArray(reviewData) ? reviewData : []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const getImageUrl = (course) => {
+    const imagePath = course.images?.[0]?.image;
+    if (!imagePath) return "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800";
+    if (imagePath.startsWith("http")) return imagePath;
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+    return `${BASE_URL}${cleanPath}`;
   };
 
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
-  };
+  if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+      </div>
+    );
 
   return (
-    <div className="bg-white text-slate-900 font-sans selection:bg-blue-100 overflow-x-hidden">
+    <div className="bg-slate-50 text-slate-900 font-sans selection:bg-blue-200 selection:text-blue-900 overflow-x-hidden">
       
-     
+      {/* --- HERO SECTION --- */}
+      <section className="relative pt-20 pb-32 overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-100 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-pulse" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-100 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-pulse" style={{ animationDelay: '2s' }} />
+        </div>
 
-      {/* --- 2. HERO SECTION --- */}
-      <header className="relative pt-16 pb-24 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
-          <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
-            <span className="bg-blue-50 text-blue-600 font-black text-[10px] tracking-[0.2em] px-4 py-2 rounded-lg uppercase inline-block mb-6 shadow-sm">
-              Level Up Your Skills
-            </span>
-            <h1 className="text-5xl lg:text-7xl font-black leading-[1.1] mb-8 tracking-tighter">
-              Master the <br /> <span className="text-blue-600">Future of IT</span>
-            </h1>
-            <p className="text-gray-500 text-xl leading-relaxed mb-10 max-w-lg font-medium">
-              Industry-leading professional training in programming, networking, and security. Fast-track your career today with our expert-led bootcamp.
-            </p>
-            <div className="flex flex-wrap gap-5">
-              <button className="bg-blue-600 text-white font-black px-10 py-5 rounded-2xl shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all hover:-translate-y-1 active:scale-95 text-sm uppercase tracking-widest">
-                Join Course
-              </button>
-              <button className="border-2 border-slate-100 text-slate-700 font-black px-10 py-5 rounded-2xl hover:bg-slate-50 transition-all text-sm uppercase tracking-widest">
-                The Institute
-              </button>
-            </div>
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-white border border-blue-100 px-4 py-2 rounded-full shadow-sm mb-8">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+              <span className="text-xs font-black uppercase tracking-widest text-slate-500">New Batches Starting Soon</span>
+            </motion.div>
+            
+            <motion.h1 variants={fadeInUp} className="text-6xl lg:text-7xl font-black leading-[1.1] mb-8 tracking-tighter text-slate-900">
+              Master the <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Future of IT</span>
+            </motion.h1>
+            
+            <motion.p variants={fadeInUp} className="text-slate-500 text-lg mb-10 max-w-lg font-medium leading-relaxed">
+              Join 1200+ successful students mastering modern technology with CSC Institute. Practical learning, industry experts, and real-world projects.
+            </motion.p>
+            
+            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 mb-12">
+              <Link to="/courses">
+                <button className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl shadow-blue-200 hover:bg-blue-700 hover:scale-105 transition-all flex items-center gap-2 group">
+                  Join Course <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
+              <Link to="/about">
+                <button className="bg-white border text-slate-600 px-8 py-4 rounded-xl font-bold hover:bg-slate-50 hover:border-slate-200 transition-all flex items-center gap-2">
+                  <Play size={18} className="fill-slate-600" /> Introduction
+                </button>
+              </Link>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="flex items-center gap-4">
+              <div className="flex -space-x-4">
+                {[1,2,3,4].map(i => (
+                  <img key={i} src={`https://i.pravatar.cc/100?u=${i+20}`} className="w-12 h-12 rounded-full border-4 border-white shadow-md relative z-0 hover:z-10 transition-all hover:scale-110" alt="Student"/>
+                ))}
+              </div>
+              <div className="flex flex-col">
+                <div className="flex text-yellow-500 mb-1">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+                </div>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Trusted by 1200+ Students</p>
+              </div>
+            </motion.div>
           </motion.div>
 
           <motion.div 
-            initial={{ opacity: 0, x: 50 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="bg-slate-900 rounded-[3.5rem] p-3 shadow-2xl overflow-hidden relative">
-              <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800" alt="Hero" className="rounded-[3rem] opacity-70 w-full object-cover h-[450px]" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-2xl border border-white/30 cursor-pointer hover:scale-110 transition-transform">
-                  <Play className="text-white fill-white ml-1" />
+            <div className="rounded-[3rem] overflow-hidden shadow-2xl relative z-10 group cursor-pointer border-4 border-white">
+              <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800" className="w-full h-[600px] object-cover transition-transform duration-700 group-hover:scale-110" alt="Hero"/>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex items-end p-10">
+                <div className="text-white">
+                  <p className="font-bold text-lg mb-2">Learn from the Best</p>
+                  <p className="text-sm text-slate-200">Industry standard curriculum and labs.</p>
                 </div>
               </div>
             </div>
+            
+            {/* Floating Elements */}
+            <motion.div 
+              animate={{ y: [0, -20, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -top-10 -left-10 bg-white p-6 rounded-3xl shadow-xl z-20 max-w-[200px]"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                  <CheckCircle2 size={20} />
+                </div>
+                <p className="font-black text-xs uppercase tracking-widest text-slate-400">Success</p>
+              </div>
+              <p className="font-bold text-slate-800 text-sm">95% Placement Rate in 2024</p>
+            </motion.div>
+
+            <motion.div 
+              animate={{ y: [0, 20, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute bottom-20 -right-10 bg-white/90 backdrop-blur-xl p-5 rounded-[2rem] flex items-center gap-4 shadow-2xl border border-white z-20"
+            >
+              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+                <Award size={24}/>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Certified</p>
+                <p className="text-sm font-bold text-slate-900">Govt. Approved</p>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
-      </header>
-
-      {/* --- 3. CORE FEATURES --- */}
-      <section className="max-w-7xl mx-auto px-6 py-12">
-        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { icon: <Users />, label: "100% Practical", color: "text-blue-600 bg-blue-50" },
-            { icon: <Award />, label: "Certified Trainers", color: "text-orange-600 bg-orange-50" },
-            { icon: <BookOpen />, label: "Affordable Fees", color: "text-green-600 bg-green-50" },
-            { icon: <Clock />, label: "Placement Support", color: "text-purple-600 bg-purple-50" }
-          ].map((item, i) => (
-            <motion.div key={i} variants={fadeInUp} className="bg-white p-8 rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-xl transition-all text-center">
-              <div className={`${item.color} w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5`}>
-                {item.icon}
-              </div>
-              <h3 className="font-black text-slate-800 text-sm tracking-tight">{item.label}</h3>
-            </motion.div>
-          ))}
-        </motion.div>
       </section>
 
-      {/* --- 4. PROFESSIONAL COURSES --- */}
-      <section className="py-24 bg-slate-50/50">
+      {/* --- FEATURES SECTION --- */}
+      <section className="py-20">
+         <div className="max-w-7xl mx-auto px-6">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="grid grid-cols-2 md:grid-cols-4 gap-6"
+            >
+              {[
+                { icon: <Users size={24} />, label: "100% Practical", color: "text-blue-600", bg: "bg-blue-50" },
+                { icon: <Award size={24} />, label: "Certified Trainers", color: "text-orange-600", bg: "bg-orange-50" },
+                { icon: <BookOpen size={24} />, label: "Affordable Fees", color: "text-green-600", bg: "bg-green-50" },
+                { icon: <Clock size={24} />, label: "Placement Support", color: "text-purple-600", bg: "bg-purple-50" },
+              ].map((item, i) => (
+                <motion.div
+                  variants={fadeInUp}
+                  key={i}
+                  whileHover={{ y: -5 }}
+                  className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all text-center group cursor-pointer"
+                >
+                  <div className={`${item.color} ${item.bg} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform`}>
+                    {item.icon}
+                  </div>
+                  <h3 className="font-black text-slate-800 text-sm tracking-tight">{item.label}</h3>
+                </motion.div>
+              ))}
+            </motion.div>
+         </div>
+      </section>
+
+      {/* --- COURSES SECTION --- */}
+      <section className="py-32 bg-white rounded-t-[4rem] relative z-10 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-end mb-16">
             <div>
-              <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Our Programs</span>
-              <h2 className="text-4xl font-black mt-4 tracking-tighter">Professional Courses</h2>
+              <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Start Learning</span>
+              <h2 className="text-4xl lg:text-5xl font-black mt-4 tracking-tighter text-slate-900">Popular Courses</h2>
             </div>
-            <button className="text-blue-600 font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2 hover:underline">
-              View All <ArrowRight size={14} />
-            </button>
+            <Link to="/courses" className="text-blue-600 font-bold text-sm flex items-center gap-2 hover:gap-4 transition-all">
+              View All Courses <ArrowRight size={16} />
+            </Link>
           </div>
+
           <div className="grid md:grid-cols-3 gap-10">
-            {[
-              { title: "Full Stack Web Dev", img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500", badge: "Best Seller" },
-              { title: "Data Analytics Python", img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500", badge: "Trending" },
-              { title: "Graphic UI/UX Design", img: "https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?w=500", badge: "New" }
-            ].map((course, i) => (
-              <motion.div key={i} whileHover={{ y: -10 }} className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/40">
-                <div className="h-56 relative">
-                  <img src={course.img} alt={course.title} className="w-full h-full object-cover" />
-                  <span className="absolute top-6 left-6 bg-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest">{course.badge}</span>
+            {courses.slice(0, 3).map((course, i) => (
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="bg-white rounded-[2.5rem] p-4 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col group"
+              >
+                <div className="h-64 relative rounded-[2rem] overflow-hidden mb-6">
+                  <img src={getImageUrl(course)} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.src = "https://via.placeholder.com/500"; }} />
+                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1">
+                    <Clock size={12} className="text-blue-600" /> {course.duration}
+                  </div>
                 </div>
-                <div className="p-10">
-                  <h3 className="text-xl font-black mb-6 tracking-tight">{course.title}</h3>
-                  <div className="flex justify-between items-center pt-6 border-t border-slate-50">
-                    <div className="flex text-yellow-400 gap-1"><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/></div>
-                    <button className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors"><ChevronRight size={18}/></button>
+
+                <div className="px-4 pb-4 flex flex-col flex-grow">
+                  <h3 className="text-xl font-black mb-3 tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                    {course.title}
+                  </h3>
+                  <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">
+                    {course.short_description}
+                  </p>
+                  <div className="mt-auto pt-6 border-t border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Instructor</span>
+                        <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-slate-200"></div>
+                            <span className="text-xs font-bold text-slate-700">Expert</span>
+                        </div>
+                    </div>
+                    <Link to={`/courses/${course.slug}`} className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-500/30 group-hover:rotate-[-45deg]">
+                      <ChevronRight size={20} />
+                    </Link>
                   </div>
                 </div>
               </motion.div>
@@ -120,142 +329,131 @@ const FullHomePage = () => {
         </div>
       </section>
 
-      {/* --- 5. ABOUT SECTION --- */}
-      <section className="py-32 max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="relative">
-            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800" alt="About" className="rounded-[3rem] shadow-2xl" />
-            <div className="absolute -bottom-8 -right-8 bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-50">
-              <p className="text-4xl font-black text-blue-600 leading-none">15+</p>
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest mt-2">Years of <br /> Excellence</p>
-            </div>
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-            <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Who We Are</span>
-            <h2 className="text-4xl font-black mt-4 mb-8 tracking-tighter">About CSC Institute</h2>
-            <p className="text-gray-500 text-lg leading-relaxed mb-8 font-medium">
-              Empowering Students Since 2010. We offer industry-driven training that bridges the gap between traditional education and high-demand tech roles.
-            </p>
-            <div className="grid grid-cols-2 gap-y-4 mb-10">
-              {["Practical Learning", "Expert Mentors", "Job Assistance", "Modern Labs"].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 font-bold text-slate-700 text-sm">
-                  <CheckCircle2 size={18} className="text-blue-500" /> {item}
-                </div>
-              ))}
-            </div>
-            <button className="text-blue-600 font-black text-xs uppercase tracking-widest underline decoration-4 underline-offset-8">Learn More About Us</button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* --- 6. OUR GALLERY --- */}
-      <section className="py-24 bg-slate-50/50">
+      {/* --- GALLERY SECTION (MASONRY-ISH) --- */}
+      <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Our Campus</span>
-            <h2 className="text-4xl font-black mt-4 tracking-tighter">Our Gallery</h2>
-          </div>
-          <div className="grid grid-cols-12 gap-6 h-[600px]">
-            <motion.div whileHover={{ scale: 0.98 }} className="col-span-12 md:col-span-4 rounded-[2.5rem] overflow-hidden shadow-lg h-full">
-              <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600" className="w-full h-full object-cover" />
-            </motion.div>
-            <div className="col-span-12 md:col-span-8 grid grid-rows-2 gap-6 h-full">
-              <div className="grid grid-cols-2 gap-6 h-full">
-                <motion.div whileHover={{ scale: 0.98 }} className="rounded-[2.5rem] overflow-hidden shadow-lg"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600" className="w-full h-full object-cover" /></motion.div>
-                <motion.div whileHover={{ scale: 0.98 }} className="rounded-[2.5rem] overflow-hidden shadow-lg"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600" className="w-full h-full object-cover" /></motion.div>
-              </div>
-              <motion.div whileHover={{ scale: 0.98 }} className="rounded-[2.5rem] overflow-hidden shadow-lg h-full"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1000" className="w-full h-full object-cover" /></motion.div>
+            <div className="text-center mb-20">
+                <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Life at Campus</span>
+                <h2 className="text-4xl font-black mt-4 tracking-tighter">Our Gallery</h2>
             </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-4 h-[600px]">
+                <div className="col-span-2 row-span-2 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
+                </div>
+                <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
+                </div>
+                <div className="col-span-1 row-span-2 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
+                </div>
+                <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
+                </div>
+            </div>
+        </div>
+      </section>
+
+      {/* --- REVIEWS SECTION --- */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+           <div className="text-center mb-16">
+            <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Testimonials</span>
+            <h2 className="text-4xl font-black mt-4 tracking-tighter">Student Success Stories</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {reviews.map((review, i) => (
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 relative group hover:bg-blue-600 hover:text-white transition-colors duration-300"
+              >
+                {/* Quote Icon */}
+                <div className="absolute top-8 right-8 text-slate-200 group-hover:text-blue-500 transition-colors">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V11C14.017 11.5523 13.5693 12 13.017 12H12.017V5H22.017V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM5.0166 21L5.0166 18C5.0166 16.8954 5.91203 16 7.0166 16H10.0166C10.5689 16 11.0166 15.5523 11.0166 15V9C11.0166 8.44772 10.5689 8 10.0166 8H6.0166C5.46432 8 5.0166 8.44772 5.0166 9V11C5.0166 11.5523 4.56889 12 4.0166 12H3.0166V5H13.0166V15C13.0166 18.3137 10.3303 21 7.0166 21H5.0166Z" />
+                  </svg>
+                </div>
+
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 border-2 border-white shadow-sm">
+                    {review.image ? (
+                        <img src={review.image} alt={review.name} className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full bg-slate-300 flex items-center justify-center text-slate-500 font-bold text-lg">
+                            {review.name.charAt(0)}
+                        </div>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm tracking-tight">{review.name}</h4>
+                    <p className="text-[10px] uppercase font-black text-slate-400 group-hover:text-blue-200 tracking-widest">{review.role}</p>
+                  </div>
+                </div>
+
+                <p className="text-slate-600 text-sm italic mb-6 leading-relaxed group-hover:text-blue-50 relative z-10">
+                  "{review.review}"
+                </p>
+
+                {review.tag_text && (
+                    <div className="inline-block bg-white px-3 py-1 rounded-lg shadow-sm group-hover:bg-blue-500">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 group-hover:text-white">
+                            #{review.tag_text}
+                        </span>
+                    </div>
+                )}
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* --- 7. GET IN TOUCH (With Map) --- */}
-      <section className="py-32 max-w-7xl mt-100 mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-20">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white p-12 rounded-[3.5rem] border-2 border-slate-50 shadow-2xl">
-            <h2 className="text-4xl font-black mb-8 tracking-tighter">Get In Touch</h2>
-            <form className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <input type="text" placeholder="Name" className="bg-slate-50 border-none rounded-2xl p-5 text-sm font-bold w-full focus:ring-2 focus:ring-blue-500" />
-                <input type="text" placeholder="Phone" className="bg-slate-50 border-none rounded-2xl p-5 text-sm font-bold w-full focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <input type="email" placeholder="Email Address" className="bg-slate-50 border-none rounded-2xl p-5 text-sm font-bold w-full focus:ring-2 focus:ring-blue-500" />
-              <textarea placeholder="Message" rows="4" className="bg-slate-50 border-none rounded-2xl p-5 text-sm font-bold w-full focus:ring-2 focus:ring-blue-500"></textarea>
-              <button className="w-full bg-blue-600 text-white font-black py-5 rounded-[1.25rem] shadow-xl shadow-blue-200 uppercase tracking-widest text-xs flex items-center justify-center gap-3">
-                Send Message <Send size={16} />
-              </button>
-            </form>
+      {/* --- CONTACT SECTION --- */}
+      <section className="py-32 bg-white relative">
+        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-20">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="bg-blue-600 p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden text-white"
+          >
+            {/* Shapes */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            
+            <h2 className="text-4xl font-black mb-8 tracking-tighter relative z-10">Get In Touch</h2>
+            <ContactForm />
           </motion.div>
 
-          <div className="space-y-8">
-            <div className="grid md:grid-cols-1 gap-6">
+          <div className="flex flex-col justify-center space-y-10">
+             <div>
+                <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Contact Us</span>
+                <h2 className="text-4xl font-black mt-4 tracking-tighter text-slate-900">We're here to help you.</h2>
+                <p className="text-slate-500 mt-6 leading-relaxed">Have questions about our courses or need career guidance? Reach out to our expert team.</p>
+             </div>
+             <div className="space-y-6">
               {[
-                { icon: <MapPin />, label: "Address", text: "123 Tech Park, Silicon Valley, CA" },
-                { icon: <Phone />, label: "Call Us", text: "+1 (800) 123-4567" },
-                { icon: <Mail />, label: "Email", text: "info@cscinstitute.com" }
+                { icon: <MapPin />, label: "Visit Us", text: "36, 2nd St, Kumarappa Nagar, Katpadi, Vellore" },
+                { icon: <Phone />, label: "Call Us", text: "+91 94446 59702" },
+                { icon: <Mail />, label: "Email Us", text: "kctce2007@gmail.com" },
               ].map((info, i) => (
-                <div key={i} className="flex items-center gap-6 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
+                <div key={i} className="flex items-center gap-6 p-6 bg-slate-50 rounded-[2rem] border border-slate-100 hover:bg-white hover:shadow-lg transition-all cursor-default">
                   <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">{info.icon}</div>
-                  <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{info.label}</p><p className="font-bold text-slate-800">{info.text}</p></div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{info.label}</p>
+                    <p className="font-bold text-slate-800">{info.text}</p>
+                  </div>
                 </div>
               ))}
             </div>
-            {/* Map Placeholder */}
-            <div className="rounded-[3rem] overflow-hidden h-72 border-4 border-white shadow-2xl relative">
-              <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800" className="w-full h-full object-cover grayscale opacity-50" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <button className="bg-slate-900 text-white px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest flex items-center gap-2">
-                  <MapPin size={14} /> Open Google Maps
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* --- 8. FOOTER --- */}
-      <footer className="bg-slate-900 text-white pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
-          <div className="col-span-1">
-            <div className="flex items-center gap-2 font-black text-2xl text-blue-400 mb-8 tracking-tighter">
-              <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white text-sm">C</div> CSC Institute
-            </div>
-            <p className="text-gray-400 font-medium leading-relaxed">Providing high-end IT training to build world-class careers.</p>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-gray-500">Links</h5>
-            <ul className="space-y-4 text-gray-400 font-bold text-sm">
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Courses</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Mentors</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-gray-500">Popular</h5>
-            <ul className="space-y-4 text-gray-400 font-bold text-sm">
-              <li>Web Development</li>
-              <li>Data Science</li>
-              <li>Cyber Security</li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-gray-500">Newsletter</h5>
-            <div className="flex gap-2">
-              <input type="text" placeholder="Email" className="bg-slate-800 border-none rounded-xl px-4 py-3 text-xs w-full" />
-              <button className="bg-blue-600 p-3 rounded-xl"><Send size={16} /></button>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-800 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">
-          <p>© 2024 CSC Institute. All Rights Reserved.</p>
-          <div className="flex gap-8">
-            <Linkedin size={16} className="hover:text-white transition-colors" />
-            <Twitter size={16} className="hover:text-white transition-colors" />
-            <Facebook size={16} className="hover:text-white transition-colors" />
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

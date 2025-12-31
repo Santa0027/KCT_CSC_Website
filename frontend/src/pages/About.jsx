@@ -7,6 +7,11 @@ import {
   CheckCircle2, Globe
 } from 'lucide-react';
 
+// Import Assets
+import kctLogo from '../assets/KCT logo.jpeg';
+import msmeLogo from '../assets/msme.jpeg';
+import isoLogo from '../assets/iso.jpeg';
+
 const AboutPage = () => {
   // Animation Variants
   const fadeInUp = {
@@ -22,26 +27,23 @@ const AboutPage = () => {
   return (
     <div className="bg-white text-slate-900 font-sans selection:bg-blue-100 overflow-x-hidden">
       
-   
-
       {/* --- 2. HERO SECTION --- */}
-      <header className="relative pt-24 pb-20 text-center overflow-hidden">
+      <header className="relative pt-24 pb-20 text-center overflow-hidden bg-slate-50/50">
         <motion.div 
           initial="hidden" 
           animate="visible" 
           variants={fadeInUp}
           className="max-w-4xl mx-auto px-6"
         >
-          <span className="bg-blue-50 text-blue-600 font-black text-[10px] tracking-[0.2em] px-4 py-2 rounded-lg uppercase inline-block mb-6 shadow-sm">
-            Our Story
-          </span>
-          <h1 className="text-5xl lg:text-7xl font-black leading-[1.1] mb-8 tracking-tighter">
-            Shaping the Future <br /> of <span className="text-blue-600">Tech Education</span>
+          <div className="flex justify-center items-center gap-4 mb-8">
+             <img src={kctLogo} alt="Krishnaa Logo" className="h-20 md:h-24 mix-blend-multiply" />
+          </div>
+         
+          <h1 className="text-3xl lg:text-5xl font-black leading-[1.2] mb-6 tracking-tighter text-slate-900">
+            Krishnaa CompuTech <br/> <span className="text-blue-600">Computer Education (KCT)</span>
           </h1>
-          <p className="text-gray-500 text-xl leading-relaxed font-medium">
-            CSC Institute is a premier destination for technology learning, 
-            dedicated to empowering individuals with the skills needed to 
-            excel in the ever-evolving digital world.
+          <p className="text-slate-600 text-xl md:text-2xl font-black italic tracking-tight">
+            "Enhance your Knowledge & Ensure your Success!"
           </p>
         </motion.div>
       </header>
@@ -56,12 +58,20 @@ const AboutPage = () => {
             variants={fadeInUp}
             className="relative"
           >
-            <div className="rounded-[3.5rem] overflow-hidden shadow-2xl">
+            <div className="rounded-[3.5rem] overflow-hidden shadow-2xl border-8 border-white">
               <img 
                 src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800" 
-                alt="Our Lab" 
-                className="w-full h-[500px] object-cover" 
+                alt="KCT Institute" 
+                className="w-full h-[600px] object-cover" 
               />
+            </div>
+             {/* Floating Badge - ISO */}
+             <div className="absolute -bottom-10 -right-10 bg-white p-6 rounded-[2rem] shadow-xl max-w-xs border border-slate-50 hidden md:flex items-center gap-4">
+                <img src={isoLogo} alt="ISO Logo" className="h-12 w-auto" />
+                <div>
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Certified</p>
+                  <p className="font-bold text-slate-900">ISO 9001:2015</p>
+                </div>
             </div>
           </motion.div>
 
@@ -72,184 +82,82 @@ const AboutPage = () => {
             variants={fadeInUp}
             className="space-y-8"
           >
-            <h2 className="text-4xl font-black tracking-tighter">Our History & Mission</h2>
-            <p className="text-gray-500 text-lg leading-relaxed font-medium">
-              Founded in 2010, CSC Institute was started with a simple vision: to 
-              bridge the widening gap between academic computer science 
-              education and the practical demands of the IT industry. Over the 
-              last decade, we have evolved from a small classroom into a 
-              world-class learning hub.
-            </p>
-            <p className="text-gray-500 text-lg leading-relaxed font-medium">
-              Our mission is to democratize tech education by providing 
-              affordable, high-quality, and hands-on training that results in 
-              real-world employability for our students.
-            </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-xs uppercase tracking-wider mb-2">
+              <Award size={16} />
+              <span>Since 2007</span>
+            </div>
+            <h2 className="text-4xl font-black tracking-tighter text-slate-900">About Our Journey</h2>
             
-            <div className="grid grid-cols-3 gap-6 pt-6">
-              <div>
-                <p className="text-3xl font-black text-blue-600">2010</p>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Established</p>
+            <div className="space-y-6 text-lg text-slate-600 leading-relaxed font-medium">
+              <p>
+                Established in <strong className="text-slate-900">2007</strong>, Krishnaa Computech Computer Education in Katpadi, Vellore,  
+                is a top player in the category of Computer Hardware and Software Training Institutes.  
+                Formerly known as <strong className="text-slate-900">Eray Computer Education</strong>, the institute was renamed in 2011 to reflect its expanded vision.  
+                Since then, we have been affiliated with <strong className="text-blue-600">Penta Tech Tamil Nadu Computer Education & Examination (PTCEE)</strong>,  
+                ensuring all courses are recognized and certified.
+              </p>
+
+              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-start gap-4">
+                 <img src={msmeLogo} alt="MSME Logo" className="h-10 w-auto mix-blend-multiply" />
+                 <div>
+                    <p className="font-bold text-slate-900 mb-1">MSME Registered Institute</p>
+                    <p className="text-sm text-slate-500">Ref: <span className="font-mono font-bold text-blue-600">UDYAM-TN-30-0088670</span></p>
+                 </div>
               </div>
-              <div>
-                <p className="text-3xl font-black text-blue-600">60+</p>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Expert Mentors</p>
-              </div>
-              <div>
-                <p className="text-3xl font-black text-blue-600">15k+</p>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Happy Students</p>
-              </div>
+
+              <p>
+                PTCEE is <strong className="text-slate-900">ISO 9001:2008</strong> and <strong className="text-slate-900">ISO 9001:2015</strong> certified, ensuring quality management and standardized education processes.
+              </p>
+
+              <p>
+                Over the years, <strong className="text-slate-900">Krishnaa Computech Computer Education (KCT)</strong> has built a strong foothold in the computer education industry in Vellore.  
+                Our belief that student satisfaction is as important as the quality of our courses has helped us grow a vast base of learners,  
+                both locally and from other parts of Vellore.
+              </p>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* --- 4. CORE VALUES --- */}
-      <section className="py-24 bg-slate-50/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div 
-            variants={staggerContainer} 
-            initial="hidden" 
-            whileInView="visible" 
-            viewport={{ once: true }} 
-            className="grid md:grid-cols-3 gap-10"
-          >
+      {/* --- 4. STATS COUNTER --- */}
+      <section className="py-20 bg-slate-900 text-white">
+         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             {[
-              { icon: <Target />, title: "Practical Learning", desc: "We focus on real-world projects and coding rather than just theory.", color: "text-blue-600 bg-white" },
-              { icon: <Heart />, title: "Community First", desc: "Building a network of developers who support each other in their careers.", color: "text-red-500 bg-white" },
-              { icon: <Rocket />, title: "Career Focus", desc: "Every course is designed to land you a job in the current tech market.", color: "text-orange-500 bg-white" }
-            ].map((value, i) => (
-              <motion.div key={i} variants={fadeInUp} className="p-10 rounded-[3rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/30 group hover:border-blue-200 transition-all">
-                <div className={`${value.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform`}>
-                  {value.icon}
-                </div>
-                <h3 className="text-xl font-black mb-4 tracking-tight">{value.title}</h3>
-                <p className="text-gray-500 font-medium leading-relaxed">{value.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* --- 5. STATS COUNTER --- */}
-      <section className="py-24 max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 border-y-2 border-slate-50 py-16">
-          {[
-            { num: "15+", label: "Years of Excellence" },
-            { num: "2000+", label: "Happy Graduates" },
-            { num: "30+", label: "Expert Mentors" },
-            { num: "98%", label: "Job Placement" }
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <p className="text-5xl font-black text-slate-900 tracking-tighter mb-2">{stat.num}</p>
-              <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- 6. MEET OUR INSTRUCTORS --- */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">The Brain Trust</span>
-            <h2 className="text-4xl font-black mt-4 tracking-tighter">Meet Our Instructors</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-10">
-            {[
-              { name: "Robert Fox", role: "Junior Web Development Instructor", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500" },
-              { name: "Jane Cooper", role: "Senior Data Scientist & Mentor", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500" },
-              { name: "Eleanor Pane", role: "UI/UX Designer & Lead", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500" }
-            ].map((mentor, i) => (
-              <motion.div key={i} whileHover={{ y: -10 }} className="group">
-                <div className="rounded-[3rem] overflow-hidden mb-6 h-[400px] shadow-2xl relative">
-                  <img src={mentor.img} alt={mentor.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-                  <div className="absolute bottom-6 left-6 right-6 p-6 bg-white/90 backdrop-blur-md rounded-[2rem] translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
-                    <div className="flex gap-4 justify-center">
-                      <Linkedin className="w-5 h-5 text-blue-600 cursor-pointer" />
-                      <Twitter className="w-5 h-5 text-blue-400 cursor-pointer" />
-                    </div>
-                  </div>
-                </div>
-                <h3 className="text-xl font-black tracking-tight text-center">{mentor.name}</h3>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mt-2">{mentor.role}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* --- 7. STUDENT SUCCESS STORIES --- */}
-      <section className="py-32 bg-slate-900 text-white rounded-[4rem] mx-6 mb-24 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 blur-[120px] rounded-full"></div>
-        <div className="max-w-7xl mx-auto px-10 relative z-10">
-          <div className="text-center mb-20">
-            <span className="text-blue-400 font-black text-[10px] tracking-[0.2em] uppercase">Testimonials</span>
-            <h2 className="text-4xl font-black mt-4 tracking-tighter">Student Success Stories</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-10">
-            {[
-              { name: "Alex Morgan", role: "Software Engineer at Google", text: "The practical approach at CSC helped me land my dream job. The mentors are top-notch!" },
-              { name: "Sarah Lee", role: "Fullstack Developer", text: "I went from zero to hiring-ready in 6 months. Best decision for my career." },
-              { name: "Michael Chen", role: "Data Analyst", text: "The curriculum is perfectly aligned with industry needs. Highly recommend this institute." }
-            ].map((testi, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] backdrop-blur-sm">
-                <div className="flex text-yellow-400 gap-1 mb-6"><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/></div>
-                <p className="text-slate-300 font-medium italic mb-8 leading-relaxed">"{testi.text}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-500/20"></div>
-                  <div>
-                    <p className="font-bold text-sm">{testi.name}</p>
-                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{testi.role}</p>
-                  </div>
-                </div>
+              { num: "2007", label: "Established" },
+              { num: "ISO", label: "Certified" },
+              { num: "MSME", label: "Registered" },
+              { num: "15k+", label: "Students" }
+            ].map((stat, i) => (
+              <div key={i}>
+                <p className="text-4xl lg:text-5xl font-black tracking-tighter mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">{stat.num}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{stat.label}</p>
               </div>
             ))}
-          </div>
-        </div>
+         </div>
       </section>
 
-      {/* --- 8. FOOTER --- */}
-      <footer className="bg-slate-900 text-white pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
-          <div className="col-span-1">
-            <div className="flex items-center gap-2 font-black text-2xl text-blue-400 mb-8 tracking-tighter">
-              <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white text-sm">C</div> CSC Institute
+
+
+      {/* --- 6. SIMPLE FOOTER --- */}
+      <footer className="bg-slate-50 border-t border-slate-200 py-12 text-center">
+         <div className="max-w-4xl mx-auto px-6 space-y-6">
+            <p className="text-slate-500 font-medium text-sm">
+              © 2025 Krishnaa CompuTech Computer Education.
+            </p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-slate-600 font-medium">
+               <span className="flex items-center gap-2">
+                 Registered under MSME 
+                 <img src={msmeLogo} alt="MSME" className="h-6 mix-blend-multiply" />
+               </span>
+               <span className="hidden md:inline text-slate-300">|</span>
+               <span>(Udyam Registration No: <strong className="text-slate-900">UDYAM-TN-30-0088670</strong>)</span>
             </div>
-            <p className="text-gray-400 font-medium leading-relaxed">Empowering the next generation of tech leaders through industry-focused education.</p>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-gray-500">Company</h5>
-            <ul className="space-y-4 text-gray-400 font-bold text-sm">
-              <li><a href="/" className="hover:text-white transition-colors">Home</a></li>
-              <li><a href="/about" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Career</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-gray-500">Contact</h5>
-            <ul className="space-y-4 text-gray-400 font-bold text-sm">
-              <li className="flex items-center gap-3"><Mail size={14}/> info@cscinstitute.com</li>
-              <li className="flex items-center gap-3"><Globe size={14}/> San Francisco, CA</li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-gray-500">Newsletter</h5>
-            <div className="flex gap-2">
-              <input type="text" placeholder="Email" className="bg-slate-800 border-none rounded-xl px-4 py-3 text-xs w-full focus:ring-1 focus:ring-blue-500" />
-              <button className="bg-blue-600 p-3 rounded-xl hover:bg-blue-500 transition-colors"><ArrowRight size={16} /></button>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-800 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">
-          <p>© 2024 CSC Institute. Designed for Excellence.</p>
-          <div className="flex gap-8">
-            <Linkedin size={16} className="hover:text-white cursor-pointer" />
-            <Twitter size={16} className="hover:text-white cursor-pointer" />
-            <Facebook size={16} className="hover:text-white cursor-pointer" />
-          </div>
-        </div>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+              Affiliated with Penta Tech Tamil Nadu Computer Education & Examination (PTCEE)
+            </p>
+         </div>
       </footer>
+    
     </div>
   );
 };
