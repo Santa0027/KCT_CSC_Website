@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   MapPin, Phone, Mail, Send, 
@@ -16,6 +16,22 @@ const EnquiryPage = () => {
       name: "", phone: "", email: "", course: "Select a course", message: ""
   });
   const [status, setStatus] = useState("idle");
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/courses/");
+        if (response.ok) {
+          const data = await response.json();
+          setCourses(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   const handleChange = (e) => {
       setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -34,7 +50,7 @@ const EnquiryPage = () => {
       };
 
       try {
-          const response = await fetch("http://localhost:8000/api/contact/", {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(apiData),
@@ -172,10 +188,11 @@ const EnquiryPage = () => {
                   <div className="relative">
                     <select name="course" value={formData.course} onChange={handleChange} className="w-full bg-slate-50 border-2 border-transparent rounded-2xl py-4 px-6 text-sm font-bold focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all outline-none appearance-none cursor-pointer">
                       <option>Select a course</option>
-                      <option>Full Stack Web Development</option>
-                      <option>Data Science & AI</option>
-                      <option>Tally Prime</option>
-                      <option>DCA / HDCA</option>
+                      {courses.map(course => (
+                        <option key={course.id} value={course.title}>
+                          {course.title}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
                   </div>

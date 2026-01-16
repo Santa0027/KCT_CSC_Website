@@ -12,7 +12,7 @@ import {
   Zap,
   Award,
   Briefcase,
-  Loader2
+  Loader2,
 } from "lucide-react";
 
 const CourseCatalog = () => {
@@ -20,7 +20,7 @@ const CourseCatalog = () => {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -38,19 +38,28 @@ const CourseCatalog = () => {
     fetchCourses();
   }, []);
 
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://via.placeholder.com/600x400"; // Return a placeholder if no path
+    if (imagePath.startsWith("http")) return imagePath; // It's a full URL
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+    return `${BASE_URL}${cleanPath}`;
+  };
+
   // --- DYNAMIC LOGIC HELPERS ---
   // Using optional chaining (?.) and default values to prevent "undefined" errors
   const categories = [
     "All",
     ...new Set(
       courses
-        .filter(c => c && c.breakdown) // Only process courses with a breakdown field
+        .filter((c) => c && c.breakdown) // Only process courses with a breakdown field
         .map((c) => c.breakdown.split(" + ")[0])
     ),
   ];
 
   const filteredCourses = courses.filter(
-    (c) => activeFilter === "All" || (c.breakdown && c.breakdown.includes(activeFilter))
+    (c) =>
+      activeFilter === "All" ||
+      (c.breakdown && c.breakdown.includes(activeFilter))
   );
 
   // --- PAGINATION LOGIC ---
@@ -60,7 +69,10 @@ const CourseCatalog = () => {
   // Calculate indexes
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCourses = filteredCourses.slice(indexOfFirstItem, indexOfLastItem);
+  const currentCourses = filteredCourses.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -69,7 +81,6 @@ const CourseCatalog = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [activeFilter]);
-
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -80,7 +91,9 @@ const CourseCatalog = () => {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-white">
         <Loader2 className="animate-spin text-blue-600 mb-4" size={40} />
-        <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.3em]">Loading Catalog...</p>
+        <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.3em]">
+          Loading Catalog...
+        </p>
       </div>
     );
   }
@@ -104,12 +117,16 @@ const CourseCatalog = () => {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative"
+          >
             <div className="bg-slate-900 rounded-[3rem] p-3 shadow-2xl overflow-hidden relative group">
               <img
-                src={courses[0]?.images?.[0]?.image ? `${BASE_URL}${courses[0].images[0].image}` : "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800"}
+                src="./../public/9963615.jpg"
                 alt="Tech Hero"
-                className="rounded-[2.5rem] opacity-60 w-full object-cover h-[400px]"
+                className="rounded-[2.5rem] opacity-95 w-full object-cover h-[400px]"
               />
               <div className="absolute bottom-10 left-10 bg-white/90 backdrop-blur-md p-6 rounded-[2rem] shadow-2xl flex items-center gap-4">
                 <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg">
@@ -133,10 +150,22 @@ const CourseCatalog = () => {
       <section className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { icon: <Zap size={18} />, label: "Practical Learning" },
-            { icon: <ShieldCheck size={18} />, label: "Expert Mentors" },
-            { icon: <Award size={18} />, label: "Certification" },
-            { icon: <Briefcase size={18} />, label: "Job Support" },
+            {
+              icon: <Zap size={18} />,
+              label: "Practical Learning",
+            },
+            {
+              icon: <ShieldCheck size={18} />,
+              label: "Expert Mentors",
+            },
+            {
+              icon: <Award size={18} />,
+              label: "Certification",
+            },
+            {
+              icon: <Briefcase size={18} />,
+              label: "Job Support",
+            },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-4 group">
               <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
@@ -181,7 +210,6 @@ const CourseCatalog = () => {
             </div>
           </div>
 
-
           {/* Dynamic Course Grid */}
           <div className="grid md:grid-cols-3 gap-10 min-h-[500px]">
             {currentCourses.map((course) => (
@@ -196,13 +224,18 @@ const CourseCatalog = () => {
               >
                 <div className="h-52 relative overflow-hidden">
                   <img
-                    src={course.images?.[0]?.image ? `${BASE_URL}${course.images[0].image}` : "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600"}
-                    alt={course.title}
+                    src={
+                      getImageUrl(course?.images?.[0]?.image) || "/4827588.jpg"
+                    }
+                    alt={course?.title || "Course image"}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600"; }}
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://via.placeholder.com/600x400";
+                    }}
                   />
                   <span className="absolute top-5 left-5 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                    {course.duration}
+                    {course?.duration}
                   </span>
                 </div>
 
@@ -248,42 +281,40 @@ const CourseCatalog = () => {
             /* Pagination Controls */
             filteredCourses.length > itemsPerPage && (
               <div className="flex justify-center mt-20 gap-4">
-                 <button 
+                <button
                   onClick={() => paginate(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="w-12 h-12 rounded-2xl flex items-center justify-center border-2 border-slate-100 text-slate-500 hover:border-blue-600 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold"
-                 >
-                   &lt;
-                 </button>
-                 
-                 {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => paginate(i + 1)}
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xs transition-all ${
-                        currentPage === i + 1
-                          ? "bg-blue-600 text-white shadow-xl shadow-blue-200"
-                          : "bg-white border-2 border-slate-100 text-slate-500 hover:border-blue-600 hover:text-blue-600"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                 ))}
+                >
+                  &lt;
+                </button>
 
-                 <button 
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => paginate(i + 1)}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xs transition-all ${
+                      currentPage === i + 1
+                        ? "bg-blue-600 text-white shadow-xl shadow-blue-200"
+                        : "bg-white border-2 border-slate-100 text-slate-500 hover:border-blue-600 hover:text-blue-600"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+
+                <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="w-12 h-12 rounded-2xl flex items-center justify-center border-2 border-slate-100 text-slate-500 hover:border-blue-600 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold"
-                 >
-                   &gt;
-                 </button>
+                >
+                  &gt;
+                </button>
               </div>
             )
           )}
         </div>
       </section>
-
-      
     </div>
   );
 };

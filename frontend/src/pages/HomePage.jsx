@@ -6,6 +6,8 @@ import {
   MapPin, Phone, Mail, CheckCircle2, Send, Loader2
 } from "lucide-react";
 
+import Gallery from "../components/Gallery";
+
 // Animation Variants
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -31,7 +33,7 @@ const ContactForm = () => {
         e.preventDefault();
         setStatus("loading");
         try {
-            const response = await fetch("http://localhost:8000/api/contact/", {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -336,19 +338,31 @@ const FullHomePage = () => {
                 <span className="text-blue-600 font-black text-[10px] tracking-[0.2em] uppercase">Life at Campus</span>
                 <h2 className="text-4xl font-black mt-4 tracking-tighter">Our Gallery</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-4 h-[600px]">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 h-[800px]">
                 <div className="col-span-2 row-span-2 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
+                    <img src="./pic1.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 1"/>
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
                 </div>
                 <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
-                     <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
-                </div>
-                <div className="col-span-1 row-span-2 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
-                     <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
+                     <img src="./pic2.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 2"/>
                 </div>
                 <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
-                     <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""/>
+                     <img src="./pic3.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 3"/>
+                </div>
+                <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="./pic4.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 4"/>
+                </div>
+                <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="./pic5.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 5"/>
+                </div>
+                <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="./pic6.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 6"/>
+                </div>
+                <div className="col-span-1 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="./pic7.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 7"/>
+                </div>
+                <div className="col-span-2 row-span-1 rounded-[2.5rem] overflow-hidden relative group shadow-lg">
+                     <img src="./pic8.jpeg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Gallery image 8"/>
                 </div>
             </div>
         </div>
