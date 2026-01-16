@@ -60,7 +60,7 @@ const AboutPage = () => {
           >
             <div className="rounded-[3.5rem] overflow-hidden shadow-2xl border-8 border-white">
               <img 
-                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800" 
+                src="./../public/pic2.jpeg" 
                 alt="KCT Institute" 
                 className="w-full h-[600px] object-cover" 
               />

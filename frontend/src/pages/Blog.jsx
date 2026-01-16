@@ -10,7 +10,7 @@ const BlogPage = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
   // 1. Fetch Data from Django API
   useEffect(() => {

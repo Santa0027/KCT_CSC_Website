@@ -38,9 +38,10 @@ const CourseCatalog = () => {
     fetchCourses();
   }, []);
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "https://via.placeholder.com/600x400"; // Return a placeholder if no path
-    if (imagePath.startsWith("http")) return imagePath; // It's a full URL
+  const getImageUrl = (course) => {
+    const imagePath = course.images?.[0]?.image;
+    if (!imagePath) return "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800";
+    if (imagePath.startsWith("http")) return imagePath;
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
     return `${BASE_URL}${cleanPath}`;
   };
@@ -224,9 +225,7 @@ const CourseCatalog = () => {
               >
                 <div className="h-52 relative overflow-hidden">
                   <img
-                    src={
-                      getImageUrl(course?.images?.[0]?.image) || "/4827588.jpg"
-                    }
+                    src={getImageUrl(course)}
                     alt={course?.title || "Course image"}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     onError={(e) => {

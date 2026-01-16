@@ -93,7 +93,7 @@ const FullHomePage = () => {
   const [courses, setCourses] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,7 +143,7 @@ const FullHomePage = () => {
           <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-100 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-pulse" style={{ animationDelay: '2s' }} />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto px-6 mt-10 grid lg:grid-cols-2 gap-16 items-center">
           <motion.div 
             initial="hidden"
             animate="visible"
@@ -214,7 +214,7 @@ const FullHomePage = () => {
             <motion.div 
               animate={{ y: [0, -20, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-10 -left-10 bg-white p-6 rounded-3xl shadow-xl z-20 max-w-[200px]"
+              className="absolute -top-10 -left-10 mt-10 bg-white p-6 rounded-3xl shadow-xl z-20 max-w-[200px]"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">

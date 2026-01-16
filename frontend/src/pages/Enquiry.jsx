@@ -21,7 +21,7 @@ const EnquiryPage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/courses/");
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/courses/`);
         if (response.ok) {
           const data = await response.json();
           setCourses(data);
